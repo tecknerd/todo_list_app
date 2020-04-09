@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>To-Do List</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="script.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.css">
+    <link rel="stylesheet" href="style.css" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div id="page-container">
+
+        <div id="to-do-list">
+
+            <div id="settings-panel">
+                <label :class="[{'hide-visibility': !showSettings}, 'settings-label']">
+                    <i :class="[moveItemsToBottom ? 'far fa-check-square' : 'far fa-square', 'pointer-cursor']"
+                        @click="moveItemsToBottom = flipBoolean(moveItemsToBottom)"
+                        @keyup.enter="moveItemsToBottom = flipBoolean(moveItemsToBottom)" tabindex="0">
+                    </i>Move items to bottom of list when completed
+                </label>
+
+                <i id="settings-button" class="fas fa-ellipsis-v pointer-cursor"
+                    @click='showSettings = flipBoolean(showSettings)'
+                    @keyup.enter='showSettings = flipBoolean(showSettings)' alt='Settings' tabindex="0">
+                </i>
+            </div>
+
+            <div id="form-container">
+                <h1 contenteditable="true">To-do List</h1>
+
+                <form v-on:submit.prevent="addNewItem">
+                    <div id="add-item">
+
+                        <label> Priority:
+                            <select is="priority-select" v-model="newItemPriority"></select>
+                        </label>
+
+                        <label>
+                            <input type="text" maxlength="50" v-model="newItemText" placeholder="Enter something to do"
+                                :autofocus="'autofocus'" required>
+                            <i class="fas fa-plus pointer-cursor" title="Add New Item" @click='addNewItem'
+                                @keyup.enter='addNewItem' tabindex=" 0"></i>
+                        </label>
+                    </div>
+                </form>
+
+            </div>
+
+            <div id="list-display">
+                <div v-if="items.length > 0">
+                    <h2>
+                        {{ incompleteCount }} Thing<span v-if="incompleteCount != 1">s</span> To-do
+                        <i :class="[showFilter ? 'fas fa-angle-up' : 'fas fa-angle-down', 'pointer-cursor']"
+                            @click="showFilter = flipBoolean(showFilter)"
+                            @keyup.enter="showFilter=flipBoolean(showFilter)" title="Hide/Show Filter Panel"
+                            tabindex="0"></i>
+                    </h2>
+                    <div :class=" [{'hide-display': !showFilter}, 'bottom-spacing']">
+                        <label title="Filter">
+                            <i class="fas fa-filter"></i>
+                            <select v-model="filterBy" tabindex="0">
+                                <option selected>All</option>
+                                <option>Completed</option>
+                                <option>Incomplete</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            <i class="fas fa-sort-alpha-down pointer-cursor" title="Alphabetical Sort"
+                                @click="sortAlphabetically" @keyup.enter="sortAlphabetically" alt='a -> z'
+                                tabindex="0"></i>
+                            <i class="fas fa-sort-alpha-up-alt pointer-cursor" title="Reverse Alphabetical Sort"
+                                @click="sortByAlphaReversed" @keyup.enter="sortByAlphaReversed" alt='z -> a'
+                                tabindex="0"></i>
+                            <i class="fas fa-sort-amount-down-alt pointer-cursor" title="Lowest Priority First"
+                                @click="sortByLowestPriority" @keyup.enter="sortByLowestPriority" alt='low -> hi'
+                                tabindex="0"></i>
+                            <i class="fas fa-sort-amount-up pointer-cursor" title="Highest Priority First"
+                                @click="sortByHighestPriority" @keyup.enter="sortByHighestPriority" alt='hi -> low'
+                                tabindex="0"></i>
+                            <i class="fas fa-sort pointer-cursor" title="Incomplete First" @click="sortByCompleted"
+                                @keyup.enter="sortByCompleted" alt='compl -> incompl' tabindex="0"></i>
+                            <i class="fas fa-info-circle" alt='info' title="Specific sorting can be done by using a combination of available sorting 
+methods. (i.e., to sort alphabetically with the highest priority first 
+and seperated by incomplete first, click: 
+Alphabetical Sort -> Sort by Highest Priority First -> Incomplete First.)">
+                            </i>
+                        </label>
+                    </div>
+
+                </div>
+
+                <div v-else>
+                    <h2>Nothing to do</h2>
+                    <label>Catch up on some sleep!
+                        <i class=" fas fa-bed"></i>
+                    </label>
+                </div>
+
+                <ul>
+                    <li v-for="item in filteredItems" :key="item.id" :class='{ "strike-through": item.completed}'
+                        draggable="true">
+
+                        <div>
+
+                            <div class='left-align'>
+                                <i :class="[item.completed ? 'far fa-check-square' : 'far fa-square', 'pointer-cursor']"
+                                    title="Complete" @click='changeCompleted(item)' @keyup.enter='changeCompleted(item)'
+                                    tabindex="0">
+                                </i>
+                            </div>
+
+                            <div id="li-label">
+                                <label>
+
+                                    <div>
+                                        <!--attempt 1-->
+                                        <span id="item-text">{{ item.text }}</span>
+
+                                        <!--attempt 2-->
+                                        <!-- <input type="text" id="item-text" v-model="item.text" value="item.text"> -->
+
+                                        <!--attempt 3-->
+                                        <!-- <textarea id="item-text" v-model="item.text"> {{item.text}} </textarea> -->
+                                    </div>
+
+                                    <div>
+                                        Priority:
+                                        <select is="priority-select"
+                                            :class="[{'strike-through': item.completed}, 'colored-bg-select']"
+                                            v-model="item.priority" :disabled="item.completed">
+                                        </select>
+                                    </div>
+
+                                </label>
+                            </div>
+
+                            <div class="right-align">
+                                <i class='fas fa-trash pointer-cursor' title="Delete" @click='removeItemById(item.id)'
+                                    @keyup.enter='removeItemById(item.id)' tabindex="0">
+                                </i>
+                            </div>
+
+                        </div>
+
+                    </li>
+                </ul>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

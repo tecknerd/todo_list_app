@@ -1,0 +1,219 @@
+:root {
+    --bg-color: rgb(92, 206, 206);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body, #page-container {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+    /* background-color: rgb(195, 227, 227); */
+    /* background-color: rgb(188, 240, 240);*/ 
+    /* background-color:rgb(158, 226, 226); */
+
+    background-image: radial-gradient(white, rgb(188, 240, 240));
+}
+
+/*----HTML Tags----*/
+
+ul {
+    padding: 0;
+    width: 99%;
+    height: 90%;
+    margin: auto;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+ul::-webkit-scrollbar-track {
+    background-color: lightgray;
+}
+
+ul::-webkit-scrollbar {
+    width: 5px;
+}
+
+ul::-webkit-scrollbar-thumb{
+    /* background-color: rgb(139, 134, 134); */
+    background-color: slategray;
+    border-radius: 10px;;
+}
+
+
+li {
+    width: 100%;
+    height: fit-content;
+    margin: 2px auto;
+    /* margin: 5px auto; */
+    padding: 5px;
+
+    background-color: var(--bg-color);
+    /* border-radius: 5px;
+    box-shadow: 2px 2px black; */
+
+    position: relative;
+    
+    overflow: auto;
+    list-style-type: none;
+}
+
+option {
+    background-color: whitesmoke;
+}
+
+i {
+    width: 5%;
+    color: black;
+}
+
+
+/*----IDs----*/
+
+#to-do-list {
+    width: 30vw;
+    min-width: 330px;
+    height: 90vh;
+    min-height: 500px;
+    position: relative;
+    top: 2%;
+    margin: auto;
+    background-color: white;
+    border-radius: 3%;
+    box-shadow:1px 1px 1px 1px black;
+}
+
+#settings-panel{
+    width: 100%;
+    position: absolute;
+    top: 10px;
+    right: 0;
+}
+
+#settings-button {
+    position: absolute;
+    right: 2%;
+}
+
+#form-container {
+    width: 100%;
+    height: 20%;
+    padding-top: 2%;
+}
+
+#list-display {
+    width: 100%;
+    height: 75%;
+    display: flex;
+    flex-direction: column;
+}
+
+#li-label {
+    width: 70%;
+    margin: auto;
+    overflow-wrap: break-word;
+}
+
+#item-text {
+    font-weight: bold;
+}
+
+/* for input-text and textarea*/
+/* #item-text {
+    border: none;
+    background-color: var(--bg-color);
+    font-weight: bold;
+    text-align: center;
+} */
+
+textarea {
+    resize: none;
+}
+
+
+/*----Classes----*/
+
+/* .wrapping-text {
+    white-space: pre-wrap;
+} */
+
+.pointer-cursor:hover{
+    cursor: pointer;
+}
+
+.bottom-spacing {
+    margin-bottom: 1%;
+}
+
+.hide-display {
+    display: none;
+}
+
+.hide-visibility {
+    visibility: hidden;
+}
+
+.settings-label {
+    border: 1px solid black;
+    box-shadow: 1px 1px 1px 1px lightgrey;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+.left-align {
+    position: absolute;
+    left: 10px;
+    top: 35%;
+    width: 10%;
+}
+
+.right-align {
+    position: absolute;
+    right: 10px;
+    top: 35%;
+    width: 10%;
+}
+
+.colored-bg-select {
+    appearance: none;
+    -webkit-appearance: none;
+
+    border: none;
+    background-color: var(--bg-color);
+    text-decoration: underline;
+}
+
+.strike-through {
+    text-decoration: line-through;
+    color: rgba(0, 0, 0, 0.5);
+    background-color: rgb(195, 227, 227);
+}
+
+.no-priority {
+    color: black;
+}
+
+.low-priority {
+    color: blue;
+}
+
+.med-priority {
+    color: rgb(216, 0, 253);
+}
+
+.high-priority {
+    color: red;
+}
+
+@media screen and (max-width: 1024px) {
+    #to-do-list {
+        width: 90vw;
+        height: 95vh;
+        margin: auto;
+        background-color: white;
+        border-radius: 3%;
+    }
+}
