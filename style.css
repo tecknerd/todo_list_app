@@ -38,7 +38,6 @@ ul::-webkit-scrollbar {
 }
 
 ul::-webkit-scrollbar-thumb{
-    /* background-color: rgb(139, 134, 134); */
     background-color: slategray;
     border-radius: 10px;;
 }
@@ -48,17 +47,13 @@ li {
     width: 100%;
     height: fit-content;
     margin: 2px auto;
-    /* margin: 5px auto; */
     padding: 5px;
-
-    background-color: var(--bg-color);
-    /* border-radius: 5px;
-    box-shadow: 2px 2px black; */
+    overflow: auto;
 
     position: relative;
     
-    overflow: auto;
     list-style-type: none;
+    background-color: var(--bg-color);
 }
 
 option {
@@ -121,24 +116,8 @@ i {
     font-weight: bold;
 }
 
-/* for input-text and textarea*/
-/* #item-text {
-    border: none;
-    background-color: var(--bg-color);
-    font-weight: bold;
-    text-align: center;
-} */
-
-textarea {
-    resize: none;
-}
-
 
 /*----Classes----*/
-
-/* .wrapping-text {
-    white-space: pre-wrap;
-} */
 
 .pointer-cursor:hover{
     cursor: pointer;
@@ -192,6 +171,12 @@ textarea {
     background-color: rgb(195, 227, 227);
 }
 
+.active-sort {
+    background-color: rgba(232, 232, 232, 1);
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
 .no-priority {
     color: black;
 }
@@ -206,14 +191,4 @@ textarea {
 
 .high-priority {
     color: red;
-}
-
-@media screen and (max-width: 1024px) {
-    #to-do-list {
-        width: 90vw;
-        height: 95vh;
-        margin: auto;
-        background-color: white;
-        border-radius: 3%;
-    }
 }

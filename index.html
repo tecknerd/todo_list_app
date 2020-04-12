@@ -18,20 +18,6 @@
 
         <div id="to-do-list">
 
-            <div id="settings-panel">
-                <label :class="[{'hide-visibility': !showSettings}, 'settings-label']">
-                    <i :class="[moveItemsToBottom ? 'far fa-check-square' : 'far fa-square', 'pointer-cursor']"
-                        @click="moveItemsToBottom = flipBoolean(moveItemsToBottom)"
-                        @keyup.enter="moveItemsToBottom = flipBoolean(moveItemsToBottom)" tabindex="0">
-                    </i>Move items to bottom of list when completed
-                </label>
-
-                <i id="settings-button" class="fas fa-ellipsis-v pointer-cursor"
-                    @click='showSettings = flipBoolean(showSettings)'
-                    @keyup.enter='showSettings = flipBoolean(showSettings)' alt='Settings' tabindex="0">
-                </i>
-            </div>
-
             <div id="form-container">
                 <h1 contenteditable="true">To-do List</h1>
 
@@ -39,11 +25,11 @@
                     <div id="add-item">
 
                         <label> Priority:
-                            <select is="priority-select" v-model="newItemPriority"></select>
+                            <select is="priority-select" v-model="newItem.priority"></select>
                         </label>
 
                         <label>
-                            <input type="text" maxlength="50" v-model="newItemText" placeholder="Enter something to do"
+                            <input type="text" maxlength="50" v-model="newItem.text" placeholder="Enter something to do"
                                 :autofocus="'autofocus'" required>
                             <i class="fas fa-plus pointer-cursor" title="Add New Item" @click='addNewItem'
                                 @keyup.enter='addNewItem' tabindex=" 0"></i>
@@ -58,11 +44,10 @@
                     <h2>
                         {{ incompleteCount }} Thing<span v-if="incompleteCount != 1">s</span> To-do
                         <i :class="[showFilter ? 'fas fa-angle-up' : 'fas fa-angle-down', 'pointer-cursor']"
-                            @click="showFilter = flipBoolean(showFilter)"
-                            @keyup.enter="showFilter=flipBoolean(showFilter)" title="Hide/Show Filter Panel"
-                            tabindex="0"></i>
+                            @click="showFilter = !showFilter" @keyup.enter="showFilter = !showFilter"
+                            title="Hide/Show Filter Panel" tabindex="0"></i>
                     </h2>
-                    <div :class=" [{'hide-display': !showFilter}, 'bottom-spacing']">
+                    <div class="bottom-spacing" v-show="showFilter">
                         <label title="Filter">
                             <i class="fas fa-filter"></i>
                             <select v-model="filterBy" tabindex="0">
@@ -74,19 +59,35 @@
 
                         <label>
                             <i class="fas fa-sort-alpha-down pointer-cursor" title="Alphabetical Sort"
-                                @click="sortAlphabetically" @keyup.enter="sortAlphabetically" alt='a -> z'
+                                :class="[{'active-sort': sortAlphaAscend.value}]"
+                                @click="flipSortValue(sortAlphaAscend, sortAlphaDescend)"
+                                @keyup.enter="flipSortValue(sortAlphaAscend, sortAlphaDescend)" alt='a -> z'
                                 tabindex="0"></i>
+
                             <i class="fas fa-sort-alpha-up-alt pointer-cursor" title="Reverse Alphabetical Sort"
-                                @click="sortByAlphaReversed" @keyup.enter="sortByAlphaReversed" alt='z -> a'
+                                :class="[{'active-sort': sortAlphaDescend.value}]"
+                                @click="flipSortValue(sortAlphaDescend, sortAlphaAscend)"
+                                @keyup.enter="flipSortValue(sortAlphaDescend, sortAlphaAscend)" alt='z -> a'
                                 tabindex="0"></i>
+
                             <i class="fas fa-sort-amount-down-alt pointer-cursor" title="Lowest Priority First"
-                                @click="sortByLowestPriority" @keyup.enter="sortByLowestPriority" alt='low -> hi'
+                                :class="[{'active-sort': sortPriorityAscend.value}]"
+                                @click="flipSortValue(sortPriorityAscend, sortPriorityDescend)"
+                                @keyup.enter="flipSortValue(sortPriorityAscend, sortPriorityDescend)" alt='low -> hi'
                                 tabindex="0"></i>
+
                             <i class="fas fa-sort-amount-up pointer-cursor" title="Highest Priority First"
-                                @click="sortByHighestPriority" @keyup.enter="sortByHighestPriority" alt='hi -> low'
+                                :class="[{'active-sort': sortPriorityDescend.value}]"
+                                @click="flipSortValue(sortPriorityDescend, sortPriorityAscend)"
+                                @keyup.enter="flipSortValue(sortPriorityDescend, sortPriorityAscend)" alt='hi -> low'
                                 tabindex="0"></i>
-                            <i class="fas fa-sort pointer-cursor" title="Incomplete First" @click="sortByCompleted"
-                                @keyup.enter="sortByCompleted" alt='compl -> incompl' tabindex="0"></i>
+
+                            <i class="fas fa-sort pointer-cursor" title="Incomplete First"
+                                :class="[{'active-sort': sortIncompleteFirst.value}]"
+                                @click="sortIncompleteFirst.value = !sortIncompleteFirst.value"
+                                @keyup.enter="sortIncompleteFirst.value = !sortIncompleteFirst.value"
+                                alt='compl -> incompl' tabindex="0"></i>
+
                             <i class="fas fa-info-circle" alt='info' title="Specific sorting can be done by using a combination of available sorting 
 methods. (i.e., to sort alphabetically with the highest priority first 
 and seperated by incomplete first, click: 
@@ -112,8 +113,8 @@ Alphabetical Sort -> Sort by Highest Priority First -> Incomplete First.)">
 
                             <div class='left-align'>
                                 <i :class="[item.completed ? 'far fa-check-square' : 'far fa-square', 'pointer-cursor']"
-                                    title="Complete" @click='changeCompleted(item)' @keyup.enter='changeCompleted(item)'
-                                    tabindex="0">
+                                    title="Complete" @click='item.completed = !item.completed'
+                                    @keyup.enter='item.completed = !item.completed' tabindex="0">
                                 </i>
                             </div>
 
@@ -122,13 +123,10 @@ Alphabetical Sort -> Sort by Highest Priority First -> Incomplete First.)">
 
                                     <div>
                                         <!--attempt 1-->
-                                        <span id="item-text">{{ item.text }}</span>
-
-                                        <!--attempt 2-->
-                                        <!-- <input type="text" id="item-text" v-model="item.text" value="item.text"> -->
+                                        <span id="item-text">{{ item.text}}</span>
 
                                         <!--attempt 3-->
-                                        <!-- <textarea id="item-text" v-model="item.text"> {{item.text}} </textarea> -->
+                                        <!-- <textarea-label v-model="item.text"></textarea-label> -->
                                     </div>
 
                                     <div>
